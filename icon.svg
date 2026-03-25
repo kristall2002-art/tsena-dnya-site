@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#6B3FA0"/>
+  <text x="256" y="200" text-anchor="middle" font-size="120" font-family="Arial,sans-serif" font-weight="800" fill="#fff">ЦЕНА</text>
+  <text x="256" y="330" text-anchor="middle" font-size="120" font-family="Arial,sans-serif" font-weight="800" fill="#C39BD3">ДНЯ</text>
+  <text x="256" y="420" text-anchor="middle" font-size="80" font-family="Arial,sans-serif" font-weight="700" fill="#E8DAEF">WB</text>
+</svg>

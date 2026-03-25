@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Цена Дня | WB — Лучшие цены на Wildberries</title>
+<meta name="description" content="Самые дешёвые товары на Wildberries каждый день. 16 категорий, реальные скидки, проверенные цены.">
+<meta name="theme-color" content="#6B3FA0">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0b1a;
+  --bg2:#1a1328;
+  --bg3:#241c35;
+  --purple:#9b59b6;
+  --purple-dark:#6b3fa0;
+  --purple-light:#c39bd3;
+  --accent:#e74c3c;
+  --green:#27ae60;
+  --text:#f0eaf5;
+  --text2:#b8a9cc;
+  --text3:#7a6b8a;
+  --card-radius:14px;
+  --max-w:1200px;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+
+/* Header */
+.header{
+  background:linear-gradient(135deg,var(--purple-dark),#4a2578);
+  padding:16px 20px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 20px rgba(107,63,160,.4);
+}
+.header-inner{max-width:var(--max-w);margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.logo span{color:var(--purple-light)}
+.header-info{font-size:13px;color:var(--purple-light);opacity:.8}
+
+/* Category bar */
+.cat-bar{
+  background:var(--bg2);
+  padding:12px 20px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  border-bottom:1px solid var(--bg3);
+}
+.cat-bar::-webkit-scrollbar{display:none}
+.cat-bar-inner{max-width:var(--max-w);margin:0 auto;display:flex;gap:8px}
+.cat-btn{
+  flex-shrink:0;
+  padding:8px 16px;
+  border-radius:20px;
+  border:1px solid var(--bg3);
+  background:transparent;
+  color:var(--text2);
+  font-size:14px;
+  cursor:pointer;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.cat-btn:hover{border-color:var(--purple);color:var(--text)}
+.cat-btn.active{
+  background:var(--purple-dark);
+  border-color:var(--purple);
+  color:#fff;
+}
+.cat-btn .count{
+  font-size:11px;
+  background:rgba(255,255,255,.15);
+  padding:2px 6px;
+  border-radius:10px;
+  margin-left:6px;
+}
+.cat-btn.active .count{background:rgba(255,255,255,.25)}
+
+/* Main */
+.main{max-width:var(--max-w);margin:0 auto;padding:20px}
+.section-title{
+  font-size:18px;font-weight:700;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title .emoji{font-size:22px}
+
+/* Product grid */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;
+  margin-bottom:32px;
+}
+
+/* Product card */
+.card{
+  background:var(--bg2);
+  border-radius:var(--card-radius);
+  overflow:hidden;
+  border:1px solid var(--bg3);
+  transition:transform .2s,box-shadow .2s;
+  cursor:pointer;
+}
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(107,63,160,.3);
+  border-color:var(--purple-dark);
+}
+.card-img{
+  width:100%;
+  aspect-ratio:3/4;
+  object-fit:cover;
+  background:var(--bg3);
+  display:block;
+}
+.card-img.no-img{
+  display:flex;align-items:center;justify-content:center;
+  font-size:48px;color:var(--text3);
+}
+.card-body{padding:14px}
+.card-brand{font-size:12px;color:var(--purple-light);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.card-name{font-size:14px;color:var(--text);margin-top:4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-prices{margin-top:10px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price-now{font-size:22px;font-weight:800;color:#fff}
+.price-old{font-size:14px;color:var(--text3);text-decoration:line-through}
+.price-discount{
+  font-size:12px;font-weight:700;
+  background:var(--accent);
+  color:#fff;
+  padding:2px 8px;
+  border-radius:6px;
+}
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:10px;padding-top:10px;
+  border-top:1px solid var(--bg3);
+}
+.card-rating{font-size:13px;color:var(--text2)}
+.card-rating .star{color:#f1c40f}
+.card-reviews{font-size:12px;color:var(--text3)}
+
+/* Wallet badge */
+.wallet-price{
+  display:flex;align-items:center;gap:4px;
+  margin-top:4px;
+  font-size:13px;color:var(--purple-light);
+}
+.wallet-icon{font-size:14px}
+
+/* Empty state */
+.empty{
+  text-align:center;padding:60px 20px;color:var(--text3);
+}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:16px}
+
+/* Footer */
+.footer{
+  text-align:center;padding:24px;
+  color:var(--text3);font-size:13px;
+  border-top:1px solid var(--bg3);
+  margin-top:40px;
+}
+.footer a{color:var(--purple-light)}
+
+/* Loading */
+.loading{text-align:center;padding:60px;color:var(--text3)}
+.spinner{
+  width:36px;height:36px;
+  border:3px solid var(--bg3);
+  border-top-color:var(--purple);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:0 auto 12px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Responsive */
+@media(max-width:600px){
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .card-body{padding:10px}
+  .price-now{font-size:18px}
+  .card-name{font-size:13px}
+  .header{padding:12px 16px}
+  .logo{font-size:18px}
+  .main{padding:14px}
+}
+@media(max-width:380px){
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">Цена Дня <span>| WB</span></div>
+    <div class="header-info" id="updated"></div>
+  </div>
+</header>
+
+<nav class="cat-bar">
+  <div class="cat-bar-inner" id="catBar"></div>
+</nav>
+
+<main class="main" id="app">
+  <div class="loading"><div class="spinner"></div>Загрузка товаров...</div>
+</main>
+
+<footer class="footer">
+  Цена Дня | WB — лучшие цены на Wildberries каждый день<br>
+  <a href="https://t.me/tsena_dnya_wb" target="_blank">Telegram</a> · Данные обновляются каждые 10 минут
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+
+let DATA = null;
+let CATS = null;
+let activeCat = 'all';
+
+async function init() {
+  try {
+    const [prodResp, catResp] = await Promise.all([
+      fetch('/data/products.json'),
+      fetch('/data/categories.json'),
+    ]);
+    DATA = await prodResp.json();
+    CATS = await catResp.json();
+  } catch (e) {
+    $('#app').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Не удалось загрузить данные</div></div>';
+    return;
+  }
+
+  if (DATA.updatedAt) {
+    const d = new Date(DATA.updatedAt + 'Z');
+    $('#updated').textContent = 'Обновлено: ' + d.toLocaleString('ru-RU', {hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'});
+  }
+
+  renderCatBar();
+  renderProducts();
+}
+
+function renderCatBar() {
+  const bar = $('#catBar');
+  const total = CATS.reduce((s, c) => s + c.count, 0);
+
+  let html = `<button class="cat-btn active" data-cat="all">Все<span class="count">${total}</span></button>`;
+  for (const c of CATS) {
+    if (c.count === 0) continue;
+    html += `<button class="cat-btn" data-cat="${c.name}">${c.emoji} ${c.name}<span class="count">${c.count}</span></button>`;
+  }
+  bar.innerHTML = html;
+
+  bar.addEventListener('click', e => {
+    const btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    activeCat = btn.dataset.cat;
+    bar.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts();
+  });
+}
+
+function walletToSite(walletPrice) {
+  const approx = Math.round(walletPrice / 0.98);
+  for (let s = approx - 2; s <= approx + 2; s++) {
+    if (s - Math.ceil(s * 0.02) === walletPrice) return s;
+  }
+  return approx;
+}
+
+function formatPrice(n) {
+  return n.toLocaleString('ru-RU') + ' ₽';
+}
+
+function renderProducts() {
+  const app = $('#app');
+  const cats = DATA.categories;
+
+  if (activeCat !== 'all') {
+    const products = cats[activeCat] || [];
+    const catInfo = CATS.find(c => c.name === activeCat);
+    app.innerHTML = renderSection(activeCat, catInfo?.emoji || '', products);
+    return;
+  }
+
+  let html = '';
+  for (const c of CATS) {
+    const products = cats[c.name] || [];
+    if (products.length === 0) continue;
+    html += renderSection(c.name, c.emoji, products.slice(0, 6));
+  }
+
+  if (!html) {
+    html = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Пока нет товаров</div></div>';
+  }
+  app.innerHTML = html;
+}
+
+function renderSection(name, emoji, products) {
+  let html = `<div class="section-title"><span class="emoji">${emoji}</span>${name}</div><div class="grid">`;
+
+  for (const p of products) {
+    const sitePrice = walletToSite(p.price);
+    const hasDiscount = p.oldPrice && p.oldPrice > sitePrice;
+    const discount = hasDiscount ? Math.round((p.oldPrice - sitePrice) / p.oldPrice * 100) : 0;
+    const url = p.article ? `https://www.wildberries.ru/catalog/${p.article}/detail.aspx` : (p.url || '#');
+
+    let imgHtml;
+    if (p.image) {
+      imgHtml = `<img class="card-img" src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
+    } else if (p.article) {
+      // Generate image URL from article
+      const img = wbImageUrl(parseInt(p.article));
+      imgHtml = `<img class="card-img" src="${img}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
+    } else {
+      imgHtml = '<div class="card-img no-img">📦</div>';
+    }
+
+    html += `
+      <a class="card" href="${url}" target="_blank" rel="noopener">
+        ${imgHtml}
+        <div class="card-body">
+          ${p.brand ? `<div class="card-brand">${esc(p.brand)}</div>` : ''}
+          <div class="card-name">${esc(p.name)}</div>
+          <div class="card-prices">
+            <span class="price-now">${formatPrice(sitePrice)}</span>
+            ${hasDiscount ? `<span class="price-old">${formatPrice(p.oldPrice)}</span><span class="price-discount">-${discount}%</span>` : ''}
+          </div>
+          <div class="wallet-price"><span class="wallet-icon">💜</span> С WB Кошельком: ${formatPrice(p.price)}</div>
+          <div class="card-footer">
+            <span class="card-rating"><span class="star">⭐</span> ${p.rating || '—'}</span>
+            <span class="card-reviews">${p.reviews || ''}</span>
+          </div>
+        </div>
+      </a>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+// WB image URL generator (same algorithm as Python)
+const BASKETS = [
+  [143,1],[287,2],[431,3],[719,4],[1007,5],[1061,6],[1115,7],[1169,8],
+  [1313,9],[1601,10],[1655,11],[1919,12],[2045,13],[2189,14],[2405,15],
+  [2621,16],[2837,17],[3053,18],[3299,19],[3491,20],[3699,21],[3919,22],
+  [4099,23],[4299,24],[4499,25],[4699,26],[4999,27],[5199,28],[5599,29],
+  [5999,30],[6199,31],[6599,32],[6799,33],[7099,34],[7399,35],[7699,36],[7999,37]
+];
+
+function wbImageUrl(id) {
+  const vol = Math.floor(id / 100000);
+  const part = Math.floor(id / 1000);
+  let basket = 38 + Math.floor((vol - 8000) / 300);
+  for (const [limit, num] of BASKETS) {
+    if (vol <= limit) { basket = num; break; }
+  }
+  basket = Math.min(basket, 99);
+  return `https://basket-${String(basket).padStart(2,'0')}.wbbasket.ru/vol${vol}/part${part}/${id}/images/c516x688/1.webp`;
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+init();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
+</body>
+</html>
