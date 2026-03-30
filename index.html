@@ -133,6 +133,22 @@ a{color:inherit;text-decoration:none}
 }
 .section-title .emoji{font-size:22px}
 
+/* Grid toggle */
+.grid-toggle{
+  display:flex;gap:4px;align-items:center;
+  background:var(--bg2);
+  border:1px solid var(--bg3);
+  border-radius:10px;
+  padding:3px;
+}
+.grid-btn{
+  border:none;background:transparent;color:var(--text3);
+  padding:6px 10px;border-radius:8px;cursor:pointer;
+  font-size:16px;transition:all .2s;line-height:1;
+}
+.grid-btn:hover{color:var(--text)}
+.grid-btn.active{background:var(--purple-dark);color:#fff}
+
 /* Product grid */
 .grid{
   display:grid;
@@ -140,6 +156,16 @@ a{color:inherit;text-decoration:none}
   gap:16px;
   margin-bottom:32px;
 }
+.grid.cols-1{grid-template-columns:1fr}
+.grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.grid.cols-4 .card-body{padding:10px}
+.grid.cols-4 .price-now{font-size:16px}
+.grid.cols-4 .card-name{font-size:12px;-webkit-line-clamp:1}
+.grid.cols-4 .card-brand{font-size:10px}
+.grid.cols-4 .wallet-price{font-size:11px}
+.grid.cols-4 .card-footer{margin-top:6px;padding-top:6px}
+.grid.cols-4 .card-rating,.grid.cols-4 .card-reviews{font-size:11px}
 
 /* Product card */
 .card{
@@ -241,6 +267,11 @@ a{color:inherit;text-decoration:none}
 /* Responsive */
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;gap:12px}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr);gap:8px}
+  .grid.cols-4{grid-template-columns:repeat(2,1fr);gap:8px}
+  .grid.cols-2 .card-body,.grid.cols-4 .card-body{padding:8px}
+  .grid.cols-2 .price-now{font-size:18px}
+  .grid.cols-2 .card-name{font-size:13px}
   .card-body{padding:12px}
   .price-now{font-size:20px}
   .card-name{font-size:14px}
@@ -269,7 +300,13 @@ a{color:inherit;text-decoration:none}
         <div class="header-info" id="updated"></div>
       </div>
     </div>
-    <div class="header-right">
+    <div class="header-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="grid-toggle" id="gridToggle">
+        <button class="grid-btn" data-cols="1" title="1 в ряд">▬</button>
+        <button class="grid-btn active" data-cols="auto" title="Авто">▦</button>
+        <button class="grid-btn" data-cols="2" title="2 в ряд">▥</button>
+        <button class="grid-btn" data-cols="4" title="4 в ряд">▩</button>
+      </div>
       <button class="theme-toggle" id="themeBtn"><span id="themeLabel">Светлая тема</span> <span class="icon" id="themeIcon">☀️</span></button>
     </div>
   </div>
@@ -403,6 +440,7 @@ function renderProducts() {
     html = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Пока нет товаров</div></div>';
   }
   app.innerHTML = html;
+  applyGrid();
 }
 
 function renderSection(name, emoji, products) {
@@ -472,6 +510,25 @@ function esc(s) {
   d.textContent = s;
   return d.innerHTML;
 }
+
+// Grid toggle
+let gridMode = localStorage.getItem('gridMode') || 'auto';
+function applyGrid() {
+  document.querySelectorAll('.grid').forEach(g => {
+    g.classList.remove('cols-1','cols-2','cols-4');
+    if (gridMode !== 'auto') g.classList.add('cols-' + gridMode);
+  });
+  document.querySelectorAll('.grid-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cols === gridMode);
+  });
+}
+$('#gridToggle').addEventListener('click', e => {
+  const btn = e.target.closest('.grid-btn');
+  if (!btn) return;
+  gridMode = btn.dataset.cols;
+  localStorage.setItem('gridMode', gridMode);
+  applyGrid();
+});
 
 // Theme toggle
 const themeBtn = $('#themeBtn');
