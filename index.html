@@ -6,9 +6,9 @@
 <title>Цена Дня | WB — Лучшие цены на Wildberries</title>
 <meta name="description" content="Самые дешёвые товары на Wildberries каждый день. 16 категорий, реальные скидки, проверенные цены.">
 <meta name="theme-color" content="#6B3FA0">
-<link rel="manifest" href="/manifest.json">
-<link rel="icon" type="image/svg+xml" href="/icon.svg">
-<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -289,7 +289,7 @@ a{color:inherit;text-decoration:none}
 
 <header class="header">
   <div class="header-inner">
-    <img class="header-logo" src="/logo.png" alt="Цена Дня">
+    <img class="header-logo" src="logo.png" alt="Цена Дня">
     <div class="header-center">
       <div class="header-row1">
         <div class="logo">Цена Дня <span>| Wildberries</span></div>
@@ -300,20 +300,22 @@ a{color:inherit;text-decoration:none}
         <div class="header-info" id="updated"></div>
       </div>
     </div>
-    <div class="header-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <div class="grid-toggle" id="gridToggle">
-        <button class="grid-btn" data-cols="1" title="1 в ряд">▬</button>
-        <button class="grid-btn active" data-cols="auto" title="Авто">▦</button>
-        <button class="grid-btn" data-cols="2" title="2 в ряд">▥</button>
-        <button class="grid-btn" data-cols="4" title="4 в ряд">▩</button>
-      </div>
+    <div class="header-right">
       <button class="theme-toggle" id="themeBtn"><span id="themeLabel">Светлая тема</span> <span class="icon" id="themeIcon">☀️</span></button>
     </div>
   </div>
 </header>
 
 <nav class="cat-bar">
-  <div class="cat-bar-inner" id="catBar"></div>
+  <div class="cat-bar-inner">
+    <div class="grid-toggle" id="gridToggle">
+      <button class="grid-btn" data-cols="1" title="1 в ряд">▬</button>
+      <button class="grid-btn active" data-cols="auto" title="Авто">▦</button>
+      <button class="grid-btn" data-cols="2" title="2 в ряд">▥</button>
+      <button class="grid-btn" data-cols="4" title="4 в ряд">▩</button>
+    </div>
+    <div id="catBar" style="display:contents"></div>
+  </div>
 </nav>
 
 <main class="main" id="app">
@@ -336,8 +338,8 @@ let activeCat = 'all';
 async function init() {
   try {
     const [prodResp, catResp] = await Promise.all([
-      fetch('/data/products.json'),
-      fetch('/data/categories.json'),
+      fetch('data/products.json'),
+      fetch('data/categories.json'),
     ]);
     DATA = await prodResp.json();
     CATS = await catResp.json();
@@ -551,7 +553,7 @@ themeBtn.addEventListener('click', () => {
 init();
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
+  navigator.serviceWorker.register('sw.js');
 }
 </script>
 </body>
