@@ -13,6 +13,8 @@ SSG (Static Site Generation) для сайта "Цена Дня WB".
 import json
 import hashlib
 import os
+import re
+import shutil
 import sys
 import html as html_mod
 import math
@@ -396,7 +398,6 @@ def get_product_image_html(p: dict) -> str:
     if p.get("image"):
         img = p["image"]
         # Ensure high-res
-        import re
         img = re.sub(r'/c\d+x\d+/', '/c516x688/', img)
         return f'<img class="card-img" src="{img}" alt="{esc(p.get("name", ""))}" loading="lazy" onerror="this.outerHTML=\'<div class=\\\'card-img no-img\\\'>📦</div>\'">'
     elif p.get("article"):
@@ -407,7 +408,6 @@ def get_product_image_html(p: dict) -> str:
 
 def get_product_image_url(p: dict) -> str:
     """Get clean image URL for OG tags."""
-    import re
     if p.get("image"):
         return re.sub(r'/c\d+x\d+/', '/c516x688/', p["image"])
     elif p.get("article"):
@@ -530,10 +530,10 @@ def generate_product_page(
     img_url = get_product_image_url(product)
     posted_at = product.get("postedAt", "")
 
-    title = f"{esc(name)} — купить на Wildberries | Цена Дня"
-    desc = f"{esc(name)}"
+    title = f"{name} — купить на Wildberries | Цена Дня"
+    desc = f"{name}"
     if brand:
-        desc = f"{esc(brand)} — {desc}"
+        desc = f"{brand} — {desc}"
     desc += f" за {format_price(site_price)}"
     if has_discount:
         desc += f" (скидка {discount}%)"
@@ -541,7 +541,6 @@ def generate_product_page(
 
     # Image HTML for product page
     if product.get("image"):
-        import re
         img_src = re.sub(r'/c\d+x\d+/', '/c516x688/', product["image"])
         img_html = f'<img class="product-image" src="{img_src}" alt="{esc(name)}" onerror="this.outerHTML=\'<div class=\\\'product-image no-img\\\'>📦</div>\'">'
     elif article:
@@ -830,8 +829,20 @@ def main():
     n_categories = 0
     n_products = 0
 
-    # Generate category pages
+    # Safety: don't wipe existing pages if no products parsed
+    if not all_products:
+        print("WARNING: No products found, keeping existing pages")
+        return
+
+    # Clean up old generated directories
     categories_dir = SITE_DIR / "categories"
+    products_dir = SITE_DIR / "products"
+    if categories_dir.exists():
+        shutil.rmtree(categories_dir)
+    if products_dir.exists():
+        shutil.rmtree(products_dir)
+
+    # Generate category pages
     for cat in categories:
         name = cat["name"]
         products = cat_products.get(name, [])
@@ -845,7 +856,6 @@ def main():
         n_categories += 1
 
     # Generate product pages
-    products_dir = SITE_DIR / "products"
     for p in all_products:
         article = p.get("article", "")
         if not article:
