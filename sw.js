@@ -1,5 +1,5 @@
-const CACHE = 'tsena-dnya-v3';
-const STATIC = ['/icon.svg', '/manifest.json'];
+const CACHE = 'tsena-dnya-v4';
+const STATIC = ['icon.svg', 'manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
@@ -17,7 +17,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
   // HTML and data: network first, cache fallback
-  if (url.pathname === '/' || url.pathname.endsWith('.html') || url.pathname.startsWith('/data/')) {
+  if (url.pathname.endsWith('/') || url.pathname.endsWith('.html') || url.pathname.includes('/data/')) {
     e.respondWith(
       fetch(e.request).then(r => {
         const clone = r.clone();

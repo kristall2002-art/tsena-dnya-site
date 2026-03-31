@@ -9,6 +9,13 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="canonical" href="https://kristall2002-art.github.io/tsena-dnya-site/">
+<meta property="og:title" content="Цена Дня | WB">
+<meta property="og:description" content="Самые дешёвые товары на Wildberries каждый день. 16 категорий, реальные скидки, проверенные цены.">
+<meta property="og:image" content="https://kristall2002-art.github.io/tsena-dnya-site/icon-512.png">
+<meta property="og:url" content="https://kristall2002-art.github.io/tsena-dnya-site/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -292,11 +299,11 @@ a{color:inherit;text-decoration:none}
     <img class="header-logo" src="logo.png" alt="Цена Дня">
     <div class="header-center">
       <div class="header-row1">
-        <div class="logo">Цена Дня <span>| Wildberries</span></div>
+        <h1 class="logo">Цена Дня <span>| Wildberries</span></h1>
         <div class="header-sub">Поиск самых низких цен на товары каждый день</div>
       </div>
       <div class="header-row2">
-        <a class="header-tg" href="https://t.me/tsena_dnya_wb" target="_blank">👆 Ещё больше товаров в нашем Telegram-канале</a>
+        <span class="header-tg">Ещё больше товаров в нашей Telegram-группе 👉 <a href="https://t.me/tsena_dnya_wb" target="_blank" style="color:#fff;text-decoration:underline">Цена Дня | WB</a></span>
         <div class="header-info" id="updated"></div>
       </div>
     </div>
@@ -310,9 +317,7 @@ a{color:inherit;text-decoration:none}
   <div class="cat-bar-inner">
     <div class="grid-toggle" id="gridToggle">
       <button class="grid-btn" data-cols="1" title="1 в ряд">▬</button>
-      <button class="grid-btn active" data-cols="auto" title="Авто">▦</button>
-      <button class="grid-btn" data-cols="2" title="2 в ряд">▥</button>
-      <button class="grid-btn" data-cols="4" title="4 в ряд">▩</button>
+      <button class="grid-btn active" data-cols="2" title="2 в ряд">▥</button>
     </div>
     <div id="catBar" style="display:contents"></div>
   </div>
@@ -415,25 +420,42 @@ function renderProducts() {
 
   let html = '';
   if (allProducts.length > 0) {
-    html = '<div class="section-title"><span class="emoji">🔥</span>Все товары</div><div class="grid">';
+    html = '<h2 class="section-title"><span class="emoji">🔥</span>Все товары</h2><div class="grid">';
     for (const p of allProducts.slice(0, 60)) {
       const sitePrice = walletToSite(p.price);
       const hasDiscount = p.oldPrice && p.oldPrice > sitePrice;
       const discount = hasDiscount ? Math.round((p.oldPrice - sitePrice) / p.oldPrice * 100) : 0;
-      const img = p.image ? p.image.replace(/\/c\d+x\d+\//, '/c516x688/') : '';
-      const ratingHtml = p.rating ? `<span class="card-rating">⭐ ${p.rating}</span>` : '';
-      const brandHtml = p.brand ? `<div class="card-brand">${p.brand}</div>` : '';
-      html += `<a class="card" href="${p.url}" target="_blank" rel="noopener">
-        ${img ? `<div class="card-img"><img src="${img}" alt="" loading="lazy"></div>` : ''}
-        ${brandHtml}
-        <div class="card-name">${p.name}</div>
-        <div class="card-prices">
-          <span class="card-price">${sitePrice.toLocaleString('ru')}₽</span>
-          ${hasDiscount ? `<span class="card-old">${p.oldPrice.toLocaleString('ru')}₽</span><span class="card-discount">-${discount}%</span>` : ''}
-        </div>
-        ${ratingHtml}
-        <div class="card-cat">${p._emoji} ${p._cat}</div>
-      </a>`;
+      const url = p.article ? `https://www.wildberries.ru/catalog/${p.article}/detail.aspx` : (p.url || '#');
+
+      let imgHtml;
+      if (p.image) {
+        const img = p.image.replace(/\/c\d+x\d+\//, '/c516x688/');
+        imgHtml = `<img class="card-img" src="${img}" alt="${esc(p.name)}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
+      } else if (p.article) {
+        const img = wbImageUrl(parseInt(p.article));
+        imgHtml = `<img class="card-img" src="${img}" alt="${esc(p.name)}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
+      } else {
+        imgHtml = '<div class="card-img no-img">📦</div>';
+      }
+
+      html += `
+        <a class="card" href="${url}" target="_blank" rel="noopener">
+          ${imgHtml}
+          <div class="card-body">
+            ${p.brand ? `<div class="card-brand">${esc(p.brand)}</div>` : ''}
+            <div class="card-name">${esc(p.name)}</div>
+            <div class="card-prices">
+              <span class="price-now">${formatPrice(sitePrice)}</span>
+              ${hasDiscount ? `<span class="price-old">${formatPrice(p.oldPrice)}</span><span class="price-discount">-${discount}%</span>` : ''}
+            </div>
+            <div class="wallet-price"><span class="wallet-icon">💜</span> С WB Кошельком: ${formatPrice(p.price)}</div>
+            <div class="card-footer">
+              <span class="card-rating"><span class="star">⭐</span> ${p.rating || '—'}</span>
+              <span class="card-reviews">${p.reviews || ''}</span>
+            </div>
+            <div class="card-cat">${p._emoji} ${p._cat}</div>
+          </div>
+        </a>`;
     }
     html += '</div>';
   }
@@ -446,7 +468,7 @@ function renderProducts() {
 }
 
 function renderSection(name, emoji, products) {
-  let html = `<div class="section-title"><span class="emoji">${emoji}</span>${name}</div><div class="grid">`;
+  let html = `<h2 class="section-title"><span class="emoji">${emoji}</span>${name}</h2><div class="grid">`;
 
   for (const p of products) {
     const sitePrice = walletToSite(p.price);
@@ -514,7 +536,7 @@ function esc(s) {
 }
 
 // Grid toggle
-let gridMode = localStorage.getItem('gridMode') || 'auto';
+let gridMode = localStorage.getItem('gridMode') || '2';
 function applyGrid() {
   document.querySelectorAll('.grid').forEach(g => {
     g.classList.remove('cols-1','cols-2','cols-4');

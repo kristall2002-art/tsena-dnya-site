@@ -2,13 +2,13 @@
   "name": "Цена Дня | WB",
   "short_name": "Цена Дня",
   "description": "Лучшие цены на Wildberries каждый день",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0f0b1a",
   "theme_color": "#6B3FA0",
   "icons": [
-    {"src": "/icon.svg", "sizes": "any", "type": "image/svg+xml"},
-    {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png"},
-    {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png"}
+    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"},
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
   ]
 }
