@@ -165,14 +165,6 @@ a{color:inherit;text-decoration:none}
 }
 .grid.cols-1{grid-template-columns:1fr}
 .grid.cols-2{grid-template-columns:repeat(2,1fr)}
-.grid.cols-4{grid-template-columns:repeat(4,1fr)}
-.grid.cols-4 .card-body{padding:10px}
-.grid.cols-4 .price-now{font-size:16px}
-.grid.cols-4 .card-name{font-size:12px;-webkit-line-clamp:1}
-.grid.cols-4 .card-brand{font-size:10px}
-.grid.cols-4 .wallet-price{font-size:11px}
-.grid.cols-4 .card-footer{margin-top:6px;padding-top:6px}
-.grid.cols-4 .card-rating,.grid.cols-4 .card-reviews{font-size:11px}
 
 /* Product card */
 .card{
@@ -275,8 +267,7 @@ a{color:inherit;text-decoration:none}
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;gap:12px}
   .grid.cols-2{grid-template-columns:repeat(2,1fr);gap:8px}
-  .grid.cols-4{grid-template-columns:repeat(2,1fr);gap:8px}
-  .grid.cols-2 .card-body,.grid.cols-4 .card-body{padding:8px}
+  .grid.cols-2 .card-body{padding:8px}
   .grid.cols-2 .price-now{font-size:18px}
   .grid.cols-2 .card-name{font-size:13px}
   .card-body{padding:12px}
@@ -403,6 +394,7 @@ function renderProducts() {
     const products = cats[activeCat] || [];
     const catInfo = CATS.find(c => c.name === activeCat);
     app.innerHTML = renderSection(activeCat, catInfo?.emoji || '', products);
+    applyGrid();
     return;
   }
 
@@ -478,11 +470,11 @@ function renderSection(name, emoji, products) {
 
     let imgHtml;
     if (p.image) {
-      imgHtml = `<img class="card-img" src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
+      const img = p.image.replace(/\/c\d+x\d+\//, '/c516x688/');
+      imgHtml = `<img class="card-img" src="${img}" alt="${esc(p.name)}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
     } else if (p.article) {
-      // Generate image URL from article
       const img = wbImageUrl(parseInt(p.article));
-      imgHtml = `<img class="card-img" src="${img}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
+      imgHtml = `<img class="card-img" src="${img}" alt="${esc(p.name)}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
     } else {
       imgHtml = '<div class="card-img no-img">📦</div>';
     }
@@ -536,7 +528,8 @@ function esc(s) {
 }
 
 // Grid toggle
-let gridMode = localStorage.getItem('gridMode') || '2';
+let gridMode = localStorage.getItem('gridMode');
+if (gridMode !== '1' && gridMode !== '2') gridMode = '2';
 function applyGrid() {
   document.querySelectorAll('.grid').forEach(g => {
     g.classList.remove('cols-1','cols-2','cols-4');
