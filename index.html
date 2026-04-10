@@ -257,6 +257,61 @@ a{color:inherit;text-decoration:none}
   margin-top:40px;
 }
 .footer a{color:var(--purple-light)}
+
+/* Ad banner */
+.ad-banner{
+  background:linear-gradient(135deg,#e74c3c,#c0392b);
+  padding:12px 20px;
+  display:none;
+}
+.ad-banner-inner{
+  max-width:var(--max-w);margin:0 auto;
+  display:flex;align-items:center;gap:14px;
+}
+.ad-banner-img{
+  width:56px;height:56px;border-radius:10px;
+  object-fit:cover;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.3);
+}
+.ad-banner-text{flex:1;min-width:0}
+.ad-banner-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  color:rgba(255,255,255,.7);letter-spacing:1px;
+}
+.ad-banner-name{
+  font-size:14px;font-weight:700;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ad-banner-price{font-size:18px;font-weight:800;color:#fff}
+.ad-banner-old{font-size:12px;color:rgba(255,255,255,.6);text-decoration:line-through;margin-left:6px}
+.ad-banner-buy{
+  flex-shrink:0;padding:8px 20px;
+  background:#fff;color:#e74c3c;
+  border-radius:8px;font-weight:700;font-size:13px;
+  text-decoration:none;transition:opacity .2s;
+}
+.ad-banner-buy:hover{opacity:.85}
+@media(max-width:600px){
+  .ad-banner-inner{gap:10px}
+  .ad-banner-img{width:44px;height:44px}
+  .ad-banner-name{font-size:12px}
+  .ad-banner-price{font-size:15px}
+  .ad-banner-buy{padding:6px 14px;font-size:12px}
+}
+
+/* Ad card highlight */
+.card.ad-card{
+  border:2px solid #e74c3c;
+  position:relative;
+}
+.card.ad-card .ad-badge{
+  position:absolute;top:8px;left:8px;z-index:2;
+  background:#e74c3c;color:#fff;
+  font-size:10px;font-weight:700;
+  padding:3px 8px;border-radius:4px;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+
 .ad-btn{
   display:inline-block;
   margin-top:12px;
@@ -348,6 +403,19 @@ a{color:inherit;text-decoration:none}
   </div>
 </header>
 
+<div class="ad-banner" id="adBanner">
+  <a class="ad-banner-inner" id="adBannerLink" href="#" target="_blank" rel="noopener">
+    <img class="ad-banner-img" id="adBannerImg" src="" alt="">
+    <div class="ad-banner-text">
+      <div class="ad-banner-label">🔥 Реклама</div>
+      <div class="ad-banner-name" id="adBannerName"></div>
+      <span class="ad-banner-price" id="adBannerPrice"></span>
+      <span class="ad-banner-old" id="adBannerOld"></span>
+    </div>
+    <span class="ad-banner-buy">Купить</span>
+  </a>
+</div>
+
 <nav class="cat-bar">
   <div class="cat-bar-inner">
     <div class="grid-toggle" id="gridToggle">
@@ -379,16 +447,19 @@ const $ = s => document.querySelector(s);
 
 let DATA = null;
 let CATS = null;
+let ADS = [];
 let activeCat = 'all';
 
 async function init() {
   try {
-    const [prodResp, catResp] = await Promise.all([
+    const [prodResp, catResp, adsResp] = await Promise.all([
       fetch('data/products.json'),
       fetch('data/categories.json'),
+      fetch('data/ads.json').catch(() => ({ok:false})),
     ]);
     DATA = await prodResp.json();
     CATS = await catResp.json();
+    if (adsResp.ok) ADS = await adsResp.json();
   } catch (e) {
     $('#app').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Не удалось загрузить данные</div></div>';
     return;
@@ -399,8 +470,28 @@ async function init() {
     $('#updated').textContent = 'Обновлено: ' + d.toLocaleString('ru-RU', {hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'});
   }
 
+  renderAdBanner();
   renderCatBar();
   renderProducts();
+}
+
+function renderAdBanner() {
+  if (!ADS || !ADS.length) return;
+  const ad = ADS[0];
+  const banner = $('#adBanner');
+  const img = ad.image ? wbImageUrl(ad.image, 200) : '';
+  if (img) $('#adBannerImg').src = img;
+  else $('#adBannerImg').style.display = 'none';
+  $('#adBannerName').textContent = (ad.brand ? ad.brand + ' ' : '') + ad.name;
+  const sitePrice = walletToSite(ad.price);
+  $('#adBannerPrice').textContent = formatPrice(sitePrice);
+  if (ad.oldPrice && ad.oldPrice > sitePrice) {
+    $('#adBannerOld').textContent = formatPrice(ad.oldPrice);
+  } else {
+    $('#adBannerOld').style.display = 'none';
+  }
+  $('#adBannerLink').href = ad.url || ('https://www.wildberries.ru/catalog/' + ad.article + '/detail.aspx');
+  banner.style.display = 'block';
 }
 
 function renderCatBar() {
@@ -436,6 +527,45 @@ function formatPrice(n) {
   return n.toLocaleString('ru-RU') + ' ₽';
 }
 
+function renderAdCards() {
+  if (!ADS || !ADS.length) return '';
+  let html = '';
+  for (const ad of ADS) {
+    const sitePrice = walletToSite(ad.price);
+    const hasDiscount = ad.oldPrice && ad.oldPrice > sitePrice;
+    const discount = hasDiscount ? Math.round((ad.oldPrice - sitePrice) / ad.oldPrice * 100) : 0;
+    const url = ad.url || ('https://www.wildberries.ru/catalog/' + ad.article + '/detail.aspx');
+    let imgHtml;
+    if (ad.image) {
+      const img = ad.image.replace(/\/c\d+x\d+\//, '/c516x688/');
+      imgHtml = `<img class="card-img" src="${img}" alt="${esc(ad.name)}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
+    } else if (ad.article) {
+      imgHtml = `<img class="card-img" src="${wbImageUrl(parseInt(ad.article))}" alt="${esc(ad.name)}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-img no-img\\'>📦</div>'">`;
+    } else {
+      imgHtml = '<div class="card-img no-img">📦</div>';
+    }
+    html += `
+      <a class="card ad-card" href="${url}" target="_blank" rel="noopener">
+        <span class="ad-badge">🔥 Реклама</span>
+        ${imgHtml}
+        <div class="card-body">
+          ${ad.brand ? `<div class="card-brand">${esc(ad.brand)}</div>` : ''}
+          <div class="card-name">${esc(ad.name)}</div>
+          <div class="card-prices">
+            <span class="price-now">${formatPrice(sitePrice)}</span>
+            ${hasDiscount ? `<span class="price-old">${formatPrice(ad.oldPrice)}</span><span class="price-discount">-${discount}%</span>` : ''}
+          </div>
+          <div class="wallet-price"><span class="wallet-icon">💜</span> С WB Кошельком: ${formatPrice(ad.price)}</div>
+          <div class="card-footer">
+            <span class="card-rating"><span class="star">⭐</span> ${ad.rating || '—'}</span>
+            <span class="card-reviews">${ad.reviews || ''}</span>
+          </div>
+        </div>
+      </a>`;
+  }
+  return html;
+}
+
 function renderProducts() {
   const app = $('#app');
   const cats = DATA.categories;
@@ -463,6 +593,8 @@ function renderProducts() {
   let html = '';
   if (allProducts.length > 0) {
     html = '<h2 class="section-title"><span class="emoji">🔥</span>Все товары</h2><div class="grid">';
+    // Ad cards first.
+    html += renderAdCards();
     for (const p of allProducts.slice(0, 60)) {
       const sitePrice = walletToSite(p.price);
       const hasDiscount = p.oldPrice && p.oldPrice > sitePrice;
